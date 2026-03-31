@@ -19,10 +19,13 @@ hostname_oob="${hostname/./-oob.}"
 
 timer_start=$(date +%s)
 ping_count=0
-
+host_display="$hostname"
+if [ ${#host_display} -gt 25 ]; then
+  host_display="${host_display:0:23}.."
+fi
 
 while true; do
- 
+
   ((ping_count ++))
   elapsed_time=$(( $(date +%s) - timer_start ))
 
@@ -30,13 +33,13 @@ while true; do
   printf "+---------------------------+-----------+----------+\n"
   printf "| %-25s | %-9s | %-8s |\n" "Hostname" "ETH" "OOB"
   printf "+---------------------------+-----------+----------+\n"
-  
+
   ping -c 1 -W 1 "$hostname" &>/dev/null & pid1=$!
   ping -c 1 -W 1 "$hostname_oob" &>/dev/null & pid2=$!
   wait $pid1 && status_eth="${GREEN}Active${NC}" || status_eth="${RED}Inactive${NC}"
   wait $pid2 && status_oob="${GREEN}Active${NC}" || status_oob="${RED}Inactive${NC}"
 
-  printf "| %-25s | %-9b | %-8b |\n" "$hostname" "$status_eth" "$status_oob"
+  printf "| %-25s | %-20b | %-19b |\n" "$host_display" "$status_eth" "$status_oob"
   printf "+---------------------------+-----------+----------+\n"
   sleep 2
 done
